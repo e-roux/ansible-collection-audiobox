@@ -1,0 +1,17 @@
+---
+- name: Add Gerbera APT repository (Debian)
+  ansible.builtin.deb822_repository:
+    name: gerbera
+    types: [deb]
+    uris: https://pkg.gerbera.io/debian
+    signed_by: https://pkg.gerbera.io/public.asc
+    suites: ["{{ ansible_distribution_release }}"]
+    components: ["main"]
+    state: present
+    enabled: true
+
+- name: Install gerbera (Debian)
+  ansible.builtin.apt:
+    name: gerbera
+    state: present
+    update_cache: true

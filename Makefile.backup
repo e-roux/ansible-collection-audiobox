@@ -1,0 +1,14 @@
+
+.PHONY: this.test
+this.test: .EXTRA_PREREQS += $(MOLECULE)
+this.test: 
+	cd roles/mediaplayer && \
+		$(MOLECULE) list
+
+test: this.test
+
+gerbera: .EXTRA_PREREQS += $(ANSIBLE-RUNNER)
+gerbera:
+	$(ANSIBLE-RUNNER) run /tmp/$(@F) \
+		-p  playbooks/rpi-hifiberry-box.yml \
+		--tags=gerbera

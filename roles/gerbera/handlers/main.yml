@@ -1,0 +1,6 @@
+---
+- name: Restart Gerbera
+  ansible.builtin.systemd:
+    name: gerbera.service
+    state: restarted
+    daemon_reload: true

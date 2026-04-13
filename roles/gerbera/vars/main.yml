@@ -1,0 +1,22 @@
+---
+gerbera_server_name: "Gerbera"
+# gerbera_server_udn: "{{ 'uuid' | community.general.uuid }}"
+gerbera_server_udn: "{{ inventory_hostname | to_uuid }}"
+
+# gerbera_server_udn: "uuid:e1afdc49-e704-4286-aebe-656d0f6ad5cc"
+gerbera_server_home: "/var/lib/gerbera"
+gerbera_server_manufacturer: "Gerbera"
+gerbera_server_manufacturer_url: "https://gerbera.io"
+gerbera_server_webroot: "/usr/share/gerbera/web"
+gerbera_server_alive: 1800
+gerbera_server_pc_directory_hide: false
+gerbera_server_ui_enabled: true
+gerbera_server_ui_show_tooltips: true
+gerbera_server_accounts_enabled: true
+gerbera_server_accounts_session_timeout: 30
+gerbera_server_accounts_user: gerbera
+gerbera_server_accounts_password: gerbera
+gerbera_server_storage_use_transactions: false
+gerbera_server_storage_sqlite3_enabled: true
+gerbera_server_storage_sqlite3_database_file: "gerbera.db"
+gerbera_server_storage_mysql_enabled: false

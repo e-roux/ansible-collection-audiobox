@@ -1,0 +1,6 @@
+---
+- name: Gimme some tests
+  hosts: localhost
+  remote_user: root
+  roles:
+    - fesaille.audiobox.gerbera

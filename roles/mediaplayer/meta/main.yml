@@ -1,0 +1,20 @@
+---
+galaxy_info:
+  role_name: mediaplayer
+  namespace: fesaille
+  author: Emmanuel Roux
+  license: MIT
+  min_ansible_version: 2.9
+  version: 1.1.0
+
+  platforms:
+    - name: Debian
+      versions:
+        - bookworm
+    - name: Ubuntu
+      versions:
+        - noble
+
+  galaxy_tags: []
+
+dependencies: []

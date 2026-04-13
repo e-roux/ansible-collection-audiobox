@@ -1,0 +1,46 @@
+
+- name: Create
+  hosts: localhost
+  gather_facts: false
+  vars:
+    molecule_inventory:
+      all:
+        hosts: {}
+        molecule: {}
+  tasks:
+    - name: Check if Podman machine is running
+      block:
+        - name: Call podman machine
+          ansible.builtin.command: podman machine list --format json
+          register: podman_machines
+          changed_when: false
+
+        - name: Parse podman machine output
+          ansible.builtin.set_fact:
+            podman_machine_running: "{{ true if true in foo else false }}"
+          vars:
+            running_servers: '[*].Running'
+            foo: "{{ podman_machines.stdout | from_json | community.general.json_query(running_servers) | unique }}"
+
+        - name: Podman machine running (debug)?
+          ansible.builtin.debug:
+            var: podman_machine_running
+
+    - name: Start Podman machine if not running
+      ansible.builtin.command: podman machine start
+      when: not podman_machine_running
+      changed_when: not podman_machine_running
+
+    - name: Create a container
+      containers.podman.podman_container:
+        name: "{{ item.name }}"
+        image: "{{ item.image }}"
+        state: started
+        command: sleep 1d
+        log_driver: json-file
+      register: result
+      loop: "{{ molecule_yml.platforms }}"
+
+    - name: Print some info
+      ansible.builtin.debug:
+        msg: "{{ result.results }}"

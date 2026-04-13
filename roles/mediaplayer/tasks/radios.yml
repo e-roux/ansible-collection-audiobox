@@ -1,0 +1,76 @@
+---
+# - name: Install RadioList.json
+#   template:
+#     src: RadioList.json
+#     dest: "{{ mediaplayer_install_location }}/mediaplayer/RadioList.json"
+#     owner: mediaplayer
+#     group: audio
+#     mode: 0640
+
+- name: Include default radios definition
+  ansible.builtin.include_vars: "radios.yml"
+  when:
+    - mediaplayer_default_radios
+
+- name: Check reachable radio
+  block:
+    - name: Check if radio URLs are reachable
+      ansible.builtin.uri:
+        url: "{{ item.stream }}"
+        method: HEAD
+        return_content: false
+        status_code: 200
+      loop: "{{ radios }}"
+      loop_control:
+        label: "{{ item.name }}"
+      register: result
+      ignore_errors: true
+
+    - name: Print reachable radios
+      ansible.builtin.debug:
+        var: item
+      loop: "{{ result.results }}"
+
+    - name: Set reachable radios fact
+      ansible.builtin.set_fact:
+        reachable_radios: "{{ reachable_radios | default([]) + [item.item] }}"
+      when: item.status == 200
+      loop: "{{ result.results }}"
+      loop_control:
+        label: "{{ item.item.name }}"
+
+    - name: Print reachable radios
+      ansible.builtin.debug:
+        var: reachable_radios
+
+    - name: Generate JSON output
+      ansible.builtin.template:
+        src: "{{ role_path }}/templates/radios/tunein.j2"
+        dest: "{{ mediaplayer_install_location }}/mediaplayer/RadioList.json"
+        owner: "{{ mediaplayer_user_name }}"
+        group: "{{ mediaplayer_user_group }}"
+        mode: "0640"
+      vars:
+        radios: "{{ reachable_radios }}"
+      notify:
+        - "Restart service {{ mediaplayer_service_name }}"
+
+# - name: Install RadioList.json
+#   become: true
+#   ansible.builtin.template:
+#     src: "RadioList.json"
+#     dest: "{{ mediaplayer_install_location }}/mediaplayer/RadioList.json"
+#     owner: mediaplayer
+#     group: audio
+#     mode: "0640"
+#
+# - name: Generate JSON file from template
+#   ansible.builtin.template:
+#     src: "{{ role_path }}/templates/radios/tunein.j2"
+#     dest: /tmp/radio.json
+#     mode: "0644"
+#   register: radio_list
+#
+# - name: Log radio
+#   ansible.builtin.debug:
+#     var: radio_list

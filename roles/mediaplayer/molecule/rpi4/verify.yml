@@ -1,0 +1,43 @@
+---
+- name: Verify
+  hosts: all
+  tasks:
+    - name: Check if mediaplayer user exists
+      ansible.builtin.getent:
+        database: passwd
+        key: mediaplayer
+      register: mediaplayer_user_check
+      
+    - name: Verify mediaplayer user exists
+      ansible.builtin.assert:
+        that:
+          - mediaplayer_user_check.ansible_facts.getent_passwd.mediaplayer is defined
+        fail_msg: "Mediaplayer user was not created"
+        
+    - name: Check architecture is ARM64
+      ansible.builtin.command: uname -m
+      register: arch_check
+      changed_when: false
+      
+    - name: Verify we're testing on ARM64
+      ansible.builtin.assert:
+        that:
+          - arch_check.stdout == "aarch64"
+        fail_msg: "Not running on ARM64 architecture"
+        
+    - name: Check that mediaplayer files exist
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      register: file_checks
+      loop:
+        - "/opt/mediaplayer/mediaplayer/app.properties"
+        - "/opt/mediaplayer/mediaplayer/RadioList.json"
+        - "/opt/mediaplayer/mediaplayer/InputSources.xml"
+        - "/lib/systemd/system/mediaplayer.service"
+      
+    - name: Verify all required files exist
+      ansible.builtin.assert:
+        that:
+          - item.stat.exists
+        fail_msg: "Required file {{ item.item }} does not exist"
+      loop: "{{ file_checks.results }}"

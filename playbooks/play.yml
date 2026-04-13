@@ -1,0 +1,27 @@
+---
+- name: A simple play
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    # - name: list outdated pkgs
+    #   ansible.builtin.apt:
+    #     update_cache: yes
+    # - name: install gerbera
+    #   ansible.builtin.apt:
+    #     pkg:
+    #       - gerbera
+    #       - zsh
+    #     state: present
+    #     update_cache: no
+    - name: Include radios definition
+      ansible.builtin.include_vars: "./vars/radios.yml"
+
+    - name: Generate JSON file from template
+      ansible.builtin.template:
+        src: "vars/radios.j2"
+        dest: /tmp/radio.json
+        mode: "0644"
+
+    - name: Log radio
+      ansible.builtin.debug:
+        msg: Radio 0 is {{ radios[0] }}

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+WATCH_DIR="/path/to/watch"
+USER="your_user"
+GROUP="your_group"
+PERMISSIONS="0644"
+
+inotifywait -m -e create --format '%w%f' "$WATCH_DIR" | while read NEW_FILE
+do
+    chown $USER:$GROUP "$NEW_FILE"
+    chmod $PERMISSIONS "$NEW_FILE"
+done

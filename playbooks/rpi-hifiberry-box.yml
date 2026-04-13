@@ -1,0 +1,88 @@
+---
+- name: Update and set-up the rpi
+  hosts: all
+  become: true
+  vars:
+    default_pkgs:
+      - bluetooth
+      - bluez
+      - bluez-alsa-utils
+      - pulseaudio
+      - pulseaudio-module-bluetooth
+      - mpd
+      - mpc
+      # this one is needed for deb922_repository
+      - python3-debian
+
+  pre_tasks:
+    - name: Print ansible_run_tags
+      ansible.builtin.debug:
+        var: ansible_run_tags
+      tags:
+        - always
+
+    - name: gerbera_server_udn value
+      ansible.builtin.debug:
+        var: gerbera_server_udn
+      tags:
+        - always
+
+  #   - name: Setup the pi
+  #     ansible.builtin.include_tasks: tasks/base.yml
+  #
+  #   - name: Setup HifiBerry on the rpi
+  #     ansible.builtin.include_tasks: tasks/hifiberry.yml
+  #     # when: basic | default('disabled') == "enabled"
+  #   - name: Update the rpi
+  #     ansible.builtin.include_tasks: tasks/raspbian.yml
+  #     when: basic | default('disabled') == "enabled"
+  # tasks:
+  #   - name: Install wezterm
+  #     ansible.builtin.include_tasks: tasks/wezterm.yml
+  #     when: basic | default('disabled') == "enabled"
+  #     vars:
+  #       venv_dir: /tmp/wezterm-install
+  #       venv_python: "{{ venv_dir }}/bin/python"
+
+  roles:
+    - role: fesaille.audiobox.hifiberry
+      tags:
+        - never
+        - hifiberry
+    - role: fesaille.audiobox.mediaplayer
+      vars:
+        mediaplayer_friendly_name: clivia
+        mediaplayer_webserver_enabled: true
+        mediaplayer_webserver_port: 8088
+      tags:
+        - mediaplayer
+    - role: fesaille.audiobox.gerbera
+      vars:
+        gerbera_server:
+          ui:
+            enabled: false
+          name: "Rock &amp; Folk"
+          pc_directory_hide: true
+      # when: basic | default('disabled') == "enabled"
+      tags:
+        - gerbera
+
+  handlers:
+    - name: Reboot system
+      ansible.builtin.reboot:
+        reboot_timeout: 60
+# - name: Tune some parameters
+#   hosts: clivia
+#   tasks:
+#     - name: Set default shell
+#       ansible.builtin.user:
+#         name: "{{ ansible_user_id }}"
+#         shell: /bin/zsh
+#
+#     - name: Clone the dots
+#       ansible.builtin.git:
+#         repo: "https://{{ lookup('community.general.keyring', 'github e-roux') }}:x-oauth-basic@github.com/e-roux/dot"
+#         clone: true
+#         dest: ~/development/e-roux/dot
+#         update: true
+#         force: true
