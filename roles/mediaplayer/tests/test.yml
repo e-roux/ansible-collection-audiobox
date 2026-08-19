@@ -5,7 +5,7 @@
     - ../.
   tasks:
     - name: Include only a specific task from the role
-      include_role:
-        name: ../.
+      ansible.builtin.include_role:
+        name: mediaplayer
       tags:
         - radiolist

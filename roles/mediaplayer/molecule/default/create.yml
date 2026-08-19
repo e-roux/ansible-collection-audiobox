@@ -1,0 +1,47 @@
+---
+# Molecule create playbook for mediaplayer role
+# Ansible-Native Configuration using containers.podman collection
+
+- name: Create
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Create podman network
+      containers.podman.podman_network:
+        name: molecule-{{ molecule_yml.scenario.name }}-mediaplayer
+        state: present
+
+    - name: Create test container
+      containers.podman.podman_container:
+        name: mediaplayer-debian
+        image: debian:13
+        state: started
+        network: molecule-{{ molecule_yml.scenario.name }}-mediaplayer
+        command: ["sleep", "infinity"]
+        privileged: true
+        volumes:
+          - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
+    - name: Create inventory host_vars directory
+      ansible.builtin.file:
+        path: "{{ molecule_scenario_directory }}/inventory/host_vars"
+        state: directory
+        mode: "0755"
+
+    - name: Write connection details to inventory host_vars
+      ansible.builtin.copy:
+        dest: "{{ molecule_scenario_directory }}/inventory/host_vars/mediaplayer-debian.yml"
+        content: |
+          ---
+          ansible_connection: containers.podman.podman
+          ansible_python_interpreter: /usr/bin/python3
+        mode: "0644"
+
+    - name: Write instance config
+      ansible.builtin.copy:
+        content: |
+          - instance: mediaplayer-debian
+            connection: containers.podman.podman
+            python_interpreter: /usr/bin/python3
+        dest: "{{ molecule_instance_config }}"
+        mode: "0600"

@@ -1,0 +1,24 @@
+---
+# Molecule destroy playbook for gerbera role
+# Ansible-Native Configuration using containers.podman collection
+
+- name: Destroy
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Stop and remove test container
+      containers.podman.podman_container:
+        name: gerbera-debian
+        state: absent
+      failed_when: false
+
+    - name: Remove podman network
+      containers.podman.podman_network:
+        name: molecule-{{ molecule_yml.scenario.name }}-gerbera
+        state: absent
+      failed_when: false
+
+    - name: Clean up inventory host vars
+      ansible.builtin.file:
+        path: "{{ molecule_scenario_directory }}/inventory/host_vars/gerbera-debian.yml"
+        state: absent

@@ -3,7 +3,7 @@ gerbera_additional_groups: []
 
 gerbera_server:
   name: "Clivia"
-  udn: "uuid:e1afdc49-e704-4286-aebe-656d0f6ad5cc"
+  udn: "{{ inventory_hostname | to_uuid }}"
   home: "/var/lib/gerbera"
   manufacturer: "Gerbera"
   manufacturer_url: "https://gerbera.io"
@@ -26,47 +26,8 @@ gerbera_server:
     mysql:
       enabled: false
 
-gerbera_protocol_info:
-  extend: false
-
-gerbera_ffmpegthumbnailer:
-  enabled: false
-  thumbnail_size: 128
-  seek_percentage: 5
-  filmstrip_overlay: true
-  workaround_bugs: false
-
-gerbera_mark_played_items:
-  enabled: false
-  suppress_cds_updates: true
-  string: "*"
-  content: "video"
-
-gerbera_container:
-  location: "/New"
-  title: "Recently added"
-  sort: "-last_updated"
-  max_count: 500
-  filter: 'upnp:class derivedfrom "object.item" and last_updated &gt; "@last7"'
-
-gerbera_import:
-  hidden_files: false
-  directory:
-    location: "/audio"
-    mode: "inotify"
-    recursive: true
-    hidden_files: false
-  scripting:
-    script_charset: "UTF-8"
-    common_script: "/usr/share/gerbera/js/common.js"
-    playlist_script: "/usr/share/gerbera/js/playlists.js"
-    virtual_layout:
-      type: "builtin"
-      import_script: "/usr/share/gerbera/js/import.js"
-
-# Those control the media src
-music_group_name: music
-music_directories:
+gerbera_music_group_name: music
+gerbera_music_directories:
   - /audio
-music_group_users:
+gerbera_music_group_users:
   - gerbera

@@ -1,9 +1,10 @@
 ---
+# Molecule converge playbook for gerbera role
+
 - name: Converge
-  hosts: all
-  gather_facts: false
-  become: true
+  hosts: test_instances
+
   tasks:
-    - name: Display bogus message
-      ansible.builtin.debug:
-        msg: seems ok
+    - name: Include the gerbera role
+      ansible.builtin.include_role:
+        name: gerbera

@@ -5,29 +5,29 @@
   block:
     - name: Make sure audio is disabled
       ansible.builtin.lineinfile:
-        path: /boot/firmware/config.txt
+        path: "{{ hifiberry_config_path }}"
         line: dtparam=audio=on
         state: absent
 
     - name: Make sure audio is also disabled on vc4-fkms-v3d overlay
       ansible.builtin.lineinfile:
-        path: /boot/firmware/config.txt
+        path: "{{ hifiberry_config_path }}"
         regexp: ^(dtoverlay=vc4-kms-v3d).*
         line: \g<1>,noaudio
         backrefs: true
 
     - name: Make sure hifi berry overlay is present
       ansible.builtin.lineinfile:
-        path: /boot/firmware/config.txt
-        line: dtoverlay=hifiberry-amp
+        path: "{{ hifiberry_config_path }}"
+        line: "dtoverlay={{ hifiberry_overlay }}"
         state: present
 
 - name: Install asound.conf
   ansible.builtin.template:
     src: "{{ role_path }}/files/asound.conf"
     dest: "/etc/asound.conf"
-    owner: mediaplayer
-    group: audio
+    owner: "{{ hifiberry_owner }}"
+    group: "{{ hifiberry_group }}"
     mode: "0640"
 
 - name: Setup bluetooth
@@ -37,18 +37,3 @@
         name: bluetooth
         enabled: true
         state: started
-
-    # - name: Pair and trust Bluetooth device
-    #   ansible.builtin.shell: |
-    #     bluetoothctl << EOF
-    #     power on
-    #     agent on
-    #     default-agent
-    #     scan on
-    #     pair <MAC_ADDRESS>
-    #     trust <MAC_ADDRESS>
-    #     connect <MAC_ADDRESS>
-    #     EOF
-    #   args:
-    #     executable: /bin/bash
-

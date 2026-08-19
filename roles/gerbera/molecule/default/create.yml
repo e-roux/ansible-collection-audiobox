@@ -1,46 +1,47 @@
+---
+# Molecule create playbook for gerbera role
+# Ansible-Native Configuration using containers.podman collection
 
 - name: Create
   hosts: localhost
   gather_facts: false
-  vars:
-    molecule_inventory:
-      all:
-        hosts: {}
-        molecule: {}
   tasks:
-    - name: Check if Podman machine is running
-      block:
-        - name: Call podman machine
-          ansible.builtin.command: podman machine list --format json
-          register: podman_machines
-          changed_when: false
+    - name: Create podman network
+      containers.podman.podman_network:
+        name: molecule-{{ molecule_yml.scenario.name }}-gerbera
+        state: present
 
-        - name: Parse podman machine output
-          ansible.builtin.set_fact:
-            podman_machine_running: "{{ true if true in foo else false }}"
-          vars:
-            running_servers: '[*].Running'
-            foo: "{{ podman_machines.stdout | from_json | community.general.json_query(running_servers) | unique }}"
-
-        - name: Podman machine running (debug)?
-          ansible.builtin.debug:
-            var: podman_machine_running
-
-    - name: Start Podman machine if not running
-      ansible.builtin.command: podman machine start
-      when: not podman_machine_running
-      changed_when: not podman_machine_running
-
-    - name: Create a container
+    - name: Create test container
       containers.podman.podman_container:
-        name: "{{ item.name }}"
-        image: "{{ item.image }}"
+        name: gerbera-debian
+        image: debian:12
         state: started
-        command: sleep 1d
-        log_driver: json-file
-      register: result
-      loop: "{{ molecule_yml.platforms }}"
+        network: molecule-{{ molecule_yml.scenario.name }}-gerbera
+        command: ["sleep", "infinity"]
+        privileged: true
+        volumes:
+          - /sys/fs/cgroup:/sys/fs/cgroup:ro
 
-    - name: Print some info
-      ansible.builtin.debug:
-        msg: "{{ result.results }}"
+    - name: Create inventory host_vars directory
+      ansible.builtin.file:
+        path: "{{ molecule_scenario_directory }}/inventory/host_vars"
+        state: directory
+        mode: "0755"
+
+    - name: Write connection details to inventory host_vars
+      ansible.builtin.copy:
+        dest: "{{ molecule_scenario_directory }}/inventory/host_vars/gerbera-debian.yml"
+        content: |
+          ---
+          ansible_connection: containers.podman.podman
+          ansible_python_interpreter: /usr/bin/python3
+        mode: "0644"
+
+    - name: Write instance config
+      ansible.builtin.copy:
+        content: |
+          - instance: gerbera-debian
+            connection: containers.podman.podman
+            python_interpreter: /usr/bin/python3
+        dest: "{{ molecule_instance_config }}"
+        mode: "0600"

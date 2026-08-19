@@ -1,0 +1,5 @@
+---
+hifiberry_overlay: "hifiberry-amp"
+hifiberry_config_path: "/boot/firmware/config.txt"
+hifiberry_owner: "mediaplayer"
+hifiberry_group: "audio"
