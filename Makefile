@@ -1,35 +1,71 @@
-
-# Project Makefile for Ansible Collection
+# Project Makefile
 # Standard interface: sync, fmt, lint, typecheck, test, check, qa, clean, help
 SHELL := /bin/bash
 .SILENT:
 .ONESHELL:
 .DEFAULT_GOAL := help
+.SHELLFLAGS := -euo pipefail -c
+.DELETE_ON_ERROR:
 
 #------------------------------------------------------------------------------
 # Configuration
 #------------------------------------------------------------------------------
 
-MOLECULE := $(shell which molecule)
-ANSIBLE_RUNNER := $(shell which ansible-runner)
-ANSIBLE_LINT := $(shell which ansible-lint)
-ANSIBLE_PLAYBOOK := $(shell which ansible-playbook)
-UVX := uvx
-YAMLLINT := $(UVX) yamllint
+MOLECULE := molecule
+ANSIBLE_LINT := ansible-lint
+GALAXY := ansible-galaxy
+ANSIBLE_PLAYBOOK := ansible-playbook
+YAML_LINT := uvx yamllint
+
+#------------------------------------------------------------------------------
+# Output and optional RTK quiet-wrapper
+#------------------------------------------------------------------------------
+
+V ?= 0
+RTK_BIN := $(shell command -v rtk 2>/dev/null)
+RTK     := $(if $(RTK_BIN),$(if $(filter 1,$(V)),,$(RTK_BIN) err),)
+
+NO_COLOR ?=
+C_RESET := $(if $(NO_COLOR),,\033[0m)
+C_INFO  := $(if $(NO_COLOR),,\033[34m)
+C_OK    := $(if $(NO_COLOR),,\033[32m)
+C_WARN  := $(if $(NO_COLOR),,\033[33m)
+C_FAIL  := $(if $(NO_COLOR),,\033[31m)
+C_SKIP  := $(if $(NO_COLOR),,\033[36m)
+MSG_INFO := printf "$(C_INFO)INFO:$(C_RESET) %s\n"
+MSG_OK   := printf "$(C_OK)OK:$(C_RESET) %s\n"
+MSG_WARN := printf "$(C_WARN)WARN:$(C_RESET) %s\n" >&2
+MSG_FAIL := printf "$(C_FAIL)FAIL:$(C_RESET) %s\n" >&2
+MSG_SKIP := printf "$(C_SKIP)SKIP:$(C_RESET) %s\n"
+
+define RUN
+	$(MSG_INFO) "$@"
+	output=$$($(RTK) $(1) 2>&1) && status=0 || status=$$?; \
+	if [ "$$status" -ne 0 ]; then \
+		$(MSG_FAIL) "$@ failed"; \
+		printf "%s\n" "$$output" >&2; \
+		exit "$$status"; \
+	fi; \
+	[ "$(V)" = "1" ] && printf "%s\n" "$$output"; \
+	$(MSG_OK) "$@ complete"
+endef
 
 #------------------------------------------------------------------------------
 # Phony Targets Declaration
 #------------------------------------------------------------------------------
 
 .PHONY: help sync fmt lint typecheck check qa clean distclean
-.PHONY: test test.unit test.integration test.e2e test.watch test.check-deps test.pre-validate
-.PHONY: doc doc.build doc.serve build deploy.gerbera
+.PHONY: test test.unit test.integration test.e2e
+.PHONY: info info.vars build
+.NOTPARALLEL: check qa
 
 #------------------------------------------------------------------------------
 # High-Level Targets
 #------------------------------------------------------------------------------
 
-check: fmt lint
+check: fmt
+	$(MAKE) --no-print-directory lint
+	$(MAKE) --no-print-directory typecheck
 qa: check test
 test: test.unit
 
@@ -38,107 +74,120 @@ test: test.unit
 #------------------------------------------------------------------------------
 
 sync:
-	echo "Installing dependencies..."
-	ansible-galaxy collection install -r requirements.yml \
-		|| echo "No requirements.yml file found"
+	version=$$($(MAKE) --version 2>/dev/null | head -1)
+	case "$$version" in
+		GNU\ Make*) $(MSG_OK) "$$version" ;;
+		*) $(MSG_FAIL) "GNU Make is required (brew install make; use gmake)"; exit 1 ;;
+	esac
+	$(call RUN,$(GALAXY) collection install -r requirements.yml)
 
 #------------------------------------------------------------------------------
 # Code Quality
 #------------------------------------------------------------------------------
 
 fmt:
-	echo "Formatting code..."
-	# Ansible doesn't have a standard formatter, but we can sort yaml keys or
-	# use yamllint
-	$(YAMLLINT) -c $(XDG_CONFIG_HOME)/yamllint/yamllint.yml $(realpath $(CURDIR))/ 
+	$(call RUN,$(YAML_LINT) .)
 
 lint:
-	echo "Linting code..."
-	ansible-lint || echo "ansible-lint not installed or no issues found"
+	$(call RUN,$(ANSIBLE_LINT) .)
 
 typecheck:
-	echo "Checking types..."
-	# Ansible doesn't have traditional type checking, but we can validate syntax
-	ansible-playbook --syntax-check playbooks/*.yml || echo "No playbook syntax issues found"
+	for playbook in playbooks/*.yml; do \
+		[ -f "$$playbook" ] || continue; \
+		$(call RUN,$(ANSIBLE_PLAYBOOK) --syntax-check "$$playbook"); \
+	done
 
 #------------------------------------------------------------------------------
 # Testing
 #------------------------------------------------------------------------------
 
-test.check-deps:
-	cd roles/mediaplayer/molecule/default && \
-		bash verify-deps.sh
+test.unit:
+	$(MAKE) --no-print-directory typecheck
 
-test.pre-validate:
-	bash roles/mediaplayer/molecule/default/pre-test.sh
+test.integration:
+	for role_dir in roles/*; do \
+		if [ -d "$$role_dir/molecule" ]; then \
+			$(MSG_INFO) "Testing role: $$(basename $$role_dir)"; \
+			(cd "$$role_dir" && $(MOLECULE) test); \
+		fi; \
+	done
 
-test.unit: 
-	cd roles/mediaplayer && \
-		$(MOLECULE) test
-
-#------------------------------------------------------------------------------
-# Documentation
-#------------------------------------------------------------------------------
-
-doc.build:
-	echo "Building documentation..."
-	# Placeholder for documentation building
-
-doc.serve:
-	echo "Serving documentation..."
-	# Placeholder for serving documentation
-
-doc: doc.build
+test.e2e:
+	$(MSG_INFO) "E2E tests: use 'make test.integration' for molecule scenarios"
 
 #------------------------------------------------------------------------------
 # Build
 #------------------------------------------------------------------------------
 
 build:
-	echo "Building project..."
-	# Placeholder for build process
+	$(call RUN,$(GALAXY) collection build --force)
 
 #------------------------------------------------------------------------------
 # Cleanup
 #------------------------------------------------------------------------------
 
 clean:
-	echo "Cleaning build artifacts..."
-	# Remove temporary files and cache
-	find . -name "*.retry" -delete
-	rm -rf .molecule
+	$(MSG_INFO) "Cleaning build artifacts..."
+	rm -f *.tar.gz
+	find . -type d \( -name ".molecule" -o -name ".pytest_cache" -o -name "__pycache__" \) -prune -exec rm -rf {} +
 
 distclean: clean
-	echo "Deep cleaning..."
-	# Additional cleanup for distribution
+	$(MSG_INFO) "Performing deep clean..."
+	rm -rf .ansible dist
 
 #------------------------------------------------------------------------------
-# Custom Targets
+# Info
 #------------------------------------------------------------------------------
 
-deploy.gerbera:
-	$(ANSIBLE_RUNNER) run /tmp/$(@F) \
-		-p  playbooks/rpi-hifiberry-box.yml \
-		--tags=gerbera
+info:
+	$(MSG_INFO) "System information"
+	printf "  %-12s: %s\n" "OS" "$(shell uname -s)"
+	printf "  %-12s: %s\n" "Release" "$(shell uname -r | sed 's/-.*//')"
+	printf "  %-12s: %s\n" "Architecture" "$(shell uname -m)"
+	printf "  %-12s: %s\n" "CPU cores" "$(shell sysctl -n hw.ncpu 2>/dev/null || nproc)"
+	$(MSG_INFO) "Build environment"
+	printf "  %-12s: %s\n" "GNU Make" "$(shell make --version 2>/dev/null | head -1)"
+	printf "  %-12s: %s\n" "Shell" "$(SHELL)"
+	$(MSG_INFO) "Makefile variables"
+	$(MAKE) --no-print-directory info.vars | sort -k1,1n -k2,2 | sed -E 's/^[0-9]+\.[A-Za-z]+ //'
+
+info.vars:
+	printf "%s\n" "02.Tools MOLECULE=$(MOLECULE)"
+	printf "%s\n" "02.Tools ANSIBLE_LINT=$(ANSIBLE_LINT)"
+	printf "%s\n" "02.Tools GALAXY=$(GALAXY)"
+	printf "%s\n" "02.Tools ANSIBLE_PLAYBOOK=$(ANSIBLE_PLAYBOOK)"
+	printf "%s\n" "02.Tools YAML_LINT=$(YAML_LINT)"
 
 #------------------------------------------------------------------------------
 # Help
 #------------------------------------------------------------------------------
 
 help:
-	figlet -f standard "AudioBox" 2>/dev/null || echo "AudioBox"
+	printf "\033[36m"
+	printf "╔═╗╦ ╦╔╦╗ ╦ ╔═╗╔╗ ╔═╗╦ ╦\n"
+	printf "╠═╣║ ║ ║║ ║ ║ ║╠╩╗║ ║╔╬╝\n"
+	printf "╝ ╝╚═╝╚╩╝ ╩ ╚═╝╚═╝╚═╝╝ ╝\n"
+	printf "\033[0m\n"
 	printf "Usage: make [target]\n\n"
 	printf "\033[1;35mSetup:\033[0m\n"
-	printf "  sync            - Restore dependencies\n"
-	printf "\033[1;35mDev:\033[0m\n"
-	printf "  fmt             - Format code\n"
-	printf "  lint            - Lint code\n"
+	printf "  sync            - Install dependencies\n"
+	printf "\n"
+	printf "\033[1;35mDevelopment:\033[0m\n"
+	printf "  fmt             - Format YAML files\n"
+	printf "  lint            - Lint code with auto-fix\n"
+	printf "  typecheck       - Playbook syntax check\n"
 	printf "  check           - fmt + lint + typecheck\n"
-	printf "\033[1;35mTest:\033[0m\n"
-	printf "  test            - Run unit tests\n"
 	printf "  qa              - check + test (quality gate)\n"
-	printf "\033[1;35mDocs:\033[0m\n"
-	printf "  doc.build       - Build documentation\n"
-	printf "  doc.serve       - Serve locally\n"
-	printf "\033[1;35mInfo:\033[0m\n"
-	printf "  clean           - Remove artifacts\n"
+	printf "\n"
+	printf "\033[1;35mTest:\033[0m\n"
+	printf "  test            - Run all tests\n"
+	printf "  test.unit       - Unit / syntax tests\n"
+	printf "  test.integration - Role Molecule tests\n"
+	printf "  test.e2e        - End-to-end tests\n"
+	printf "\n"
+	printf "\033[1;35mBuild:\033[0m\n"
+	printf "  build           - Build collection package\n"
+	printf "\n"
+	printf "\033[1;35mCleanup:\033[0m\n"
+	printf "  clean           - Remove build artifacts\n"
+	printf "  distclean       - Deep clean (includes dist/)\n"

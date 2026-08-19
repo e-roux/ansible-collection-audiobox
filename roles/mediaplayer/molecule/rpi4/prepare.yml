@@ -6,7 +6,7 @@
       ansible.builtin.apt:
         update_cache: true
       when: ansible_os_family == 'Debian'
-      
+
     - name: Install basic dependencies
       ansible.builtin.package:
         name:
@@ -15,7 +15,7 @@
           - python3-pip
           - systemd
         state: present
-        
+
     - name: Install python-gpiozero (will work in mock mode)
       ansible.builtin.pip:
         name: gpiozero

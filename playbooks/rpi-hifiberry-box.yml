@@ -21,7 +21,7 @@
       tags:
         - always
 
-    - name: gerbera_server_udn value
+    - name: Gerbera server UDN value
       ansible.builtin.debug:
         var: gerbera_server_udn
       tags:
@@ -45,18 +45,18 @@
   #       venv_python: "{{ venv_dir }}/bin/python"
 
   roles:
-    - role: fesaille.audiobox.hifiberry
+    - role: hifiberry
       tags:
         - never
         - hifiberry
-    - role: fesaille.audiobox.mediaplayer
+    - role: mediaplayer
       vars:
         mediaplayer_friendly_name: clivia
         mediaplayer_webserver_enabled: true
         mediaplayer_webserver_port: 8088
       tags:
         - mediaplayer
-    - role: fesaille.audiobox.gerbera
+    - role: gerbera
       vars:
         gerbera_server:
           ui:

@@ -1,0 +1,35 @@
+---
+# Molecule verify playbook for gerbera role
+# Verifies gerbera installation completed successfully
+
+- name: Verify
+  hosts: test_instances
+  gather_facts: false
+
+  tasks:
+    - name: Check if gerbera is installed
+      ansible.builtin.command:
+        cmd: which gerbera
+      register: gerbera_binary
+      changed_when: false
+
+    - name: Assert gerbera binary exists
+      ansible.builtin.assert:
+        that:
+          - gerbera_binary.rc == 0
+        fail_msg: "gerbera binary not found"
+        success_msg: "gerbera binary found"
+
+    - name: Check gerbera version
+      ansible.builtin.command:
+        cmd: gerbera --version
+      register: gerbera_version
+      changed_when: false
+      failed_when: false
+
+    - name: Display verification summary
+      ansible.builtin.debug:
+        msg: |
+          Gerbera verification complete:
+          Binary: {{ (gerbera_binary.rc == 0) | ternary('FOUND', 'NOT FOUND') }}
+          Version: {{ gerbera_version.stdout | default('N/A') }}

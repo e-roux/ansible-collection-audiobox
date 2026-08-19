@@ -1,5 +1,0 @@
----
-roles: []
-collections:
-  - name: /Users/manu/development/github.com/e-roux/ansible-collection-audiobox
-    type: dir

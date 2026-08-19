@@ -1,6 +1,11 @@
 ---
+# Molecule verify playbook for mediaplayer role
+# Verifies binary installation completed successfully
+
 - name: Verify
-  hosts: all
+  hosts: test_instances
+  gather_facts: false
+
   tasks:
     - name: Check if mediaplayer user exists
       ansible.builtin.command:
@@ -22,7 +27,8 @@
     - name: Assert required packages are installed
       ansible.builtin.assert:
         that:
-          - "'default-jre-headless' in ansible_facts.packages or 'default-jre' in ansible_facts.packages or 'openjdk-17-jre-headless' in ansible_facts.packages or 'openjdk-17-jre' in ansible_facts.packages"
+          - "'default-jre-headless' in ansible_facts.packages or 'default-jre' in ansible_facts.packages"
+          - "'openjdk-17-jre-headless' in ansible_facts.packages or 'openjdk-17-jre' in ansible_facts.packages"
           - "'mpd' in ansible_facts.packages"
           - "'mpc' in ansible_facts.packages"
         fail_msg: "Required packages are not installed"
@@ -43,15 +49,15 @@
 
     - name: Check if mediaplayer jar exists
       ansible.builtin.stat:
-        path: /opt/mediaplayer/MediaPlayer.jar
+        path: /opt/mediaplayer/mediaplayer.jar
       register: mediaplayer_jar
 
     - name: Assert mediaplayer jar exists
       ansible.builtin.assert:
         that:
           - mediaplayer_jar.stat.exists
-        fail_msg: "MediaPlayer.jar does not exist"
-        success_msg: "MediaPlayer.jar exists"
+        fail_msg: "mediaplayer.jar does not exist"
+        success_msg: "mediaplayer.jar exists"
 
     - name: Check if app.properties exists
       ansible.builtin.stat:
@@ -93,10 +99,10 @@
     - name: Assert RadioList.json has correct structure
       ansible.builtin.assert:
         that:
-          - radio_list_parsed.radios is defined
-          - radio_list_parsed.radios | length > 0
-          - radio_list_parsed.radios[0].name is defined
-          - radio_list_parsed.radios[0].stream is defined
+          - radio_list_parsed.body is defined
+          - radio_list_parsed.body | length > 0
+          - radio_list_parsed.body[0].text is defined
+          - radio_list_parsed.body[0].URL is defined
         fail_msg: "RadioList.json does not have the correct structure"
         success_msg: "RadioList.json has the correct structure"
 
@@ -112,12 +118,22 @@
         fail_msg: "mediaplayer.service file does not exist"
         success_msg: "mediaplayer.service file exists"
 
-    - name: Check systemd service file content
-      ansible.builtin.slurp:
-        src: /lib/systemd/system/mediaplayer.service
-      register: service_content
+    - name: Verify RadioList.json radios have icons and valid streams
+      ansible.builtin.assert:
+        that:
+          - item.image is defined
+          - item.image | length > 0
+          - item.URL is defined
+          - item.URL | length > 0
+        fail_msg: "Radio {{ item.text }} is missing icon or stream URL"
+        success_msg: "Radio {{ item.text }} has valid structure"
+      loop: "{{ radio_list_parsed.body }}"
 
-    - name: Display service file content
-      ansible.builtin.debug:
-        msg: "{{ service_content['content'] | b64decode }}"
-
+    - name: Verify all radios in RadioList.json are reachable
+      ansible.builtin.uri:
+        url: "{{ item.URL }}"
+        method: HEAD
+        status_code: 200
+      loop: "{{ radio_list_parsed.body }}"
+      loop_control:
+        label: "{{ item.text }}"

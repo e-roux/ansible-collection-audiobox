@@ -1,0 +1,28 @@
+---
+# Molecule prepare playbook for gerbera role
+# Ansible-Native Configuration
+
+- name: Prepare
+  hosts: test_instances
+  gather_facts: false
+
+  tasks:
+    - name: Wait for container to be ready
+      ansible.builtin.wait_for_connection:
+        timeout: 60
+
+    - name: Gather facts for conditional tasks
+      ansible.builtin.setup:
+
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+      when: ansible_facts["os_family"] == "Debian"
+
+    - name: Install required packages
+      ansible.builtin.package:
+        name:
+          - curl
+          - gnupg
+          - software-properties-common
+        state: present

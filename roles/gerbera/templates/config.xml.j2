@@ -5,24 +5,24 @@
      information on creating and using config.xml configuration files.
     -->
   <server>
-    <ui enabled="{% if gerbera_server.ui.enabled | default(gerbera_server_ui_enabled) %}yes{% else %}no{% endif %}" show-tooltips="{% if gerbera_server.ui.show_tooltips | default(gerbera_server_ui_show_tooltips) %}yes{% else %}no{% endif %}">
-      <accounts enabled="{% if gerbera_server.accounts.enabled | default(gerbera_server_accounts_enabled) %}yes{% else %}no{% endif %}" session-timeout="{{ gerbera_server.accounts.session_timeout | default(gerbera_server_accounts_session_timeout) }}" >
-        <account user="{{ gerbera_server.accounts.user | default(gerbera_server_accounts_user) }}" password="{{ gerbera_server.accounts.password | default(gerbera_server_accounts_password) }}"/>
+    <ui enabled="{% if gerbera_server.ui.enabled %}yes{% else %}no{% endif %}" show-tooltips="{% if gerbera_server.ui.show_tooltips %}yes{% else %}no{% endif %}">
+      <accounts enabled="{% if gerbera_server.accounts.enabled %}yes{% else %}no{% endif %}" session-timeout="{{ gerbera_server.accounts.session_timeout }}">
+        <account user="{{ gerbera_server.accounts.user }}" password="{{ gerbera_server.accounts.password }}"/>
       </accounts>
     </ui>
-    <name>{{ gerbera_server.name | default(gerbera_server_name) }}</name>
-    <udn>{{ gerbera_server.udn | default(gerbera_server_udn) }}</udn>
-    <home>{{ gerbera_server.home | default(gerbera_server_home) }}</home>
-    <manufacturer>{{ gerbera_server.manufacturer | default(gerbera_server_manufacturer) }}</manufacturer>
-    <manufacturer_url>{{ gerbera_server.manufacturer_url | default(gerbera_server_manufacturer_url) }}</manufacturer_url>
-    <webroot>{{ gerbera_server.webroot | default(gerbera_server_webroot) }}</webroot>
-    <alive>{{ gerbera_server.alive | default(gerbera_server_alive) }}</alive>
-    <pc_directory upnp-hide="{{ gerbera_server.pc_directory_hide | default(gerbera_server_pc_directory_hide) | ternary('yes', 'no') }}"/>
-    <storage use-transactions="{% if gerbera_server.storage.use_transactions | default(gerbera_server_storage_use_transactions) %}yes{% else %}no{% endif %}">
-      <sqlite3 enabled="{% if gerbera_server.storage.sqlite3.enabled | default(gerbera_server_storage_sqlite3_enabled) %}yes{% else %}no{% endif %}">
-        <database-file>{{ gerbera_server.storage.sqlite3.database_file | default(gerbera_server_storage_sqlite3_database_file) }}</database-file>
+    <name>{{ gerbera_server.name }}</name>
+    <udn>{{ gerbera_server.udn }}</udn>
+    <home>{{ gerbera_server.home }}</home>
+    <manufacturer>{{ gerbera_server.manufacturer }}</manufacturer>
+    <manufacturer_url>{{ gerbera_server.manufacturer_url }}</manufacturer_url>
+    <webroot>{{ gerbera_server.webroot }}</webroot>
+    <alive>{{ gerbera_server.alive }}</alive>
+    <pc_directory upnp-hide="{{ gerbera_server.pc_directory_hide | ternary('yes', 'no') }}"/>
+    <storage use-transactions="{% if gerbera_server.storage.use_transactions %}yes{% else %}no{% endif %}">
+      <sqlite3 enabled="{% if gerbera_server.storage.sqlite3.enabled %}yes{% else %}no{% endif %}">
+        <database-file>{{ gerbera_server.storage.sqlite3.database_file }}</database-file>
       </sqlite3>
-      <mysql enabled="{% if gerbera_server.storage.mysql.enabled | default(gerbera_server_storage_mysql_enabled) %}yes{% else %}no{% endif %}">
+      <mysql enabled="{% if gerbera_server.storage.mysql.enabled %}yes{% else %}no{% endif %}">
       </mysql>
     </storage>
    <containers enabled="yes">

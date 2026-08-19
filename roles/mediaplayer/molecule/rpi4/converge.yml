@@ -2,16 +2,15 @@
 - name: Converge (RPi4 Test)
   hosts: all
   vars:
-    # Container-specific overrides for testing
     mediaplayer_test_mode: true
   roles:
-    - role: mediaplayer
+    - role: ../../../mediaplayer
       vars:
         mediaplayer_install_location: /opt/mediaplayer
         mediaplayer_user_name: mediaplayer
         mediaplayer_user_group: mediaplayer
         mediaplayer_service_name: mediaplayer
-        radios:
+        mediaplayer_radios:
           - name: 'France Culture'
             stream: 'http://direct.franceculture.fr/live/franceculture-midfi.mp3'
             img: 'https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/france-culture.png'

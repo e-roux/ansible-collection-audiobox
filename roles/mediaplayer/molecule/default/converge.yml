@@ -1,18 +1,23 @@
 ---
-- name: Install mediaplayer
-  hosts: all
-  roles:
-    - role: ../../../mediaplayer
+# Molecule converge playbook for mediaplayer role
+
+- name: Converge
+  hosts: test_instances
+
+  tasks:
+    - name: Include the mediaplayer role
+      ansible.builtin.include_role:
+        name: mediaplayer
       vars:
         mediaplayer_install_location: /opt
         mediaplayer_user_name: mediaplayer
         mediaplayer_user_group: audio
         mediaplayer_service_name: mediaplayer
         mediaplayer_test_mode: true
-        radios:
-          - name: 'France Culture'
-            stream: 'http://direct.franceculture.fr/live/franceculture-midfi.mp3'
-            img: 'https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/france-culture.png'
-          - name: 'RTE lyrics'
-            stream: 'http://radio.linnrecords.com/cast/tunein.php/linnclassical/playlist.pls'
-            img: 'http://cdn-radiotime-logos.tunein.com/s122116q.png'
+        mediaplayer_radios:
+          - name: "France Culture"
+            stream: "http://direct.franceculture.fr/live/franceculture-midfi.mp3"
+            img: "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/france-culture.png"
+          - name: "RTE lyrics"
+            stream: "http://radio.linnrecords.com/cast/tunein.php/linnclassical/playlist.pls"
+            img: "http://cdn-radiotime-logos.tunein.com/s122116q.png"

@@ -23,7 +23,7 @@
   block:
     - name: Create music group
       ansible.builtin.group:
-        name: "{{ music_group_name }}"
+        name: "{{ gerbera_music_group_name }}"
         state: present
         system: false
 
@@ -31,14 +31,14 @@
       ansible.builtin.user:
         name: "{{ item }}"
         append: true
-        groups: "{{ music_group_name }}"
-      loop: "{{ music_group_users }}"
+        groups: "{{ gerbera_music_group_name }}"
+      loop: "{{ gerbera_music_group_users }}"
 
     - name: Set directory permissions
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
-        group: "{{ music_group_name }}"
+        group: "{{ gerbera_music_group_name }}"
         mode: "0775"
         recurse: true
-      loop: "{{ music_directories }}"
+      loop: "{{ gerbera_music_directories }}"
