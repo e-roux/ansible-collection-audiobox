@@ -1,0 +1,327 @@
+{
+  "head": {
+    "status": "200"
+  },
+  "body": [
+    {
+      "preset_id": "s305918",
+      "text": "France Culture",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/france-culture.png",
+      "item": "station",
+      "URL": "http://direct.franceculture.fr/live/franceculture-midfi.mp3",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s901897",
+      "text": "France Inter",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/france-inter.png",
+      "item": "station",
+      "URL": "http://direct.franceinter.fr/live/franceinter-midfi.mp3",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s822553",
+      "text": "France Musique",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/france-musique.png",
+      "item": "station",
+      "URL": "http://direct.francemusique.fr/live/francemusique-midfi.mp3",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s960824",
+      "text": "FIP",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/fip.png",
+      "item": "station",
+      "URL": "http://direct.fipradio.fr/live/fip-midfi.mp3",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s890545",
+      "text": "France Info",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/france-info.png",
+      "item": "station",
+      "URL": "http://direct.franceinfo.fr/live/franceinfo-midfi.mp3",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s221588",
+      "text": "France Bleu",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/france-bleu.png",
+      "item": "station",
+      "URL": "http://direct.francebleu.fr/live/fb1071-midfi.mp3",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s638891",
+      "text": "Deutschlandfunk",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/dlf.png",
+      "item": "station",
+      "URL": "http://opml.radiotime.com/Tune.ashx?id=s42828",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s953491",
+      "text": "Deutschlandradio Kultur",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/dkultur.png",
+      "item": "station",
+      "URL": "http://opml.radiotime.com/Tune.ashx?id=s6628",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s851068",
+      "text": "SWR1",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/swr1.png",
+      "item": "station",
+      "URL": "http://opml.radiotime.com/Tune.ashx?id=s20291",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s161244",
+      "text": "SWR2 Kulturradio",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/swr2.png",
+      "item": "station",
+      "URL": "http://opml.radiotime.com/Tune.ashx?id=s20292",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s283582",
+      "text": "Mother earth",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/mother-earth.png",
+      "item": "station",
+      "URL": "https://www.streamserver24.com/metafiles/motherearth.pls",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s498529",
+      "text": "Yoga chill",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/yoga-chill.png",
+      "item": "station",
+      "URL": "http://opml.radiotime.com/Tune.ashx?id=s302899",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s364362",
+      "text": "BBC Radio 1",
+      "image": "http://cdn-radiotime-logos.tunein.com/s24939q.png",
+      "item": "station",
+      "URL": "http://opml.radiotime.com/Tune.ashx?id=s24939",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s931232",
+      "text": "BBC Radio 2",
+      "image": "http://cdn-radiotime-logos.tunein.com/s24940q.png",
+      "item": "station",
+      "URL": "http://opml.radiotime.com/Tune.ashx?id=s24940",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s992844",
+      "text": "BBC Radio 3",
+      "image": "http://cdn-radiotime-logos.tunein.com/s24941q.png",
+      "item": "station",
+      "URL": "http://opml.radiotime.com/Tune.ashx?id=s24941",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s167067",
+      "text": "BBC Radio 4",
+      "image": "http://cdn-radiotime-logos.tunein.com/s25419q.png",
+      "item": "station",
+      "URL": "http://opml.radiotime.com/Tune.ashx?id=s25419",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s545764",
+      "text": "BBC Radio 5",
+      "image": "http://cdn-radiotime-logos.tunein.com/s24943q.png",
+      "item": "station",
+      "URL": "http://opml.radiotime.com/Tune.ashx?id=s24943",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s360546",
+      "text": "BBC Radio 6",
+      "image": "http://cdn-radiotime-logos.tunein.com/s44491q.png",
+      "item": "station",
+      "URL": "http://opml.radiotime.com/Tune.ashx?id=s44491",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s398357",
+      "text": "Aloha Joe's Hawaiian Radio",
+      "image": "http://cdn-radiotime-logos.tunein.com/s49372q.png",
+      "item": "station",
+      "URL": "http://opml.radiotime.com/Tune.ashx?id=s49372",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s141886",
+      "text": "Live Ireland Radio",
+      "image": "http://cdn-radiotime-logos.tunein.com/s17895q.png",
+      "item": "station",
+      "URL": "http://opml.radiotime.com/Tune.ashx?id=s17895",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s194585",
+      "text": "Argentine Tango Radio",
+      "image": "http://miledmusic.com/wp-content/uploads/2014/11/32.jpg",
+      "item": "station",
+      "URL": "http://listen.argentinetangoradio.com/",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s215816",
+      "text": "Cosmos radio",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/cosmos.png",
+      "item": "station",
+      "URL": "http://makrodigital.net:8215/CosmosSoft",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s279224",
+      "text": "Linn Classical",
+      "image": "http://cdn-radiotime-logos.tunein.com/s122116q.png",
+      "item": "station",
+      "URL": "http://radio.linnrecords.com/cast/tunein.php/linnclassical/playlist.pls",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s201840",
+      "text": "Linn Jazz",
+      "image": "http://cdn-radiotime-logos.tunein.com/s122120q.png",
+      "item": "station",
+      "URL": "http://radio.linnrecords.com/cast/tunein.php/linnjazz/playlist.pls",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s104552",
+      "text": "France Musique Classique Easy",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/france-musique-easy.jpg",
+      "item": "station",
+      "URL": "http://icecast.radiofrance.fr/francemusiqueeasyclassique-hifi.aac",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s536545",
+      "text": "France Musique Classique Plus",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/france-musique-plus.jpg",
+      "item": "station",
+      "URL": "http://icecast.radiofrance.fr/francemusiqueclassiqueplus-hifi.aac",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s500149",
+      "text": "France Musique Concerts",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/france-musique-concerts.jpg",
+      "item": "station",
+      "URL": "http://icecast.radiofrance.fr/francemusiqueconcertsradiofrance-hifi.aac",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s639683",
+      "text": "France Musique Opéra",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/france-musique-opera.png",
+      "item": "station",
+      "URL": "https://icecast.radiofrance.fr/francemusiqueopera-hifi.aac",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s249279",
+      "text": "France Musique Baroque",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/france-musique-baroque.jpg",
+      "item": "station",
+      "URL": "https://icecast.radiofrance.fr/francemusiquebaroque-hifi.aac",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s643620",
+      "text": "France Musique Jazz",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/france-musique-jazz.jpg",
+      "item": "station",
+      "URL": "http://icecast.radiofrance.fr/francemusiquelajazz-hifi.aac",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s417233",
+      "text": "France Musique Contemporaine",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/france-musique-contemporaine.jpg",
+      "item": "station",
+      "URL": "http://icecast.radiofrance.fr/francemusiquelacontemporaine-hifi.aac",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s275475",
+      "text": "France Musique BO",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/france-musique-bo.jpg",
+      "item": "station",
+      "URL": "https://icecast.radiofrance.fr/francemusiquelabo-hifi.aac",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s213912",
+      "text": "France Musique Ocora Monde",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/france-musique-ocora.jpg",
+      "item": "station",
+      "URL": "http://direct.francemusique.fr/live/francemusiqueocoramonde-hifi.mp3",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s756551",
+      "text": "FIP Rock",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/fip-rock.jpg",
+      "item": "station",
+      "URL": "http://direct.fipradio.fr/live/fiprock-hifi.aac",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s525908",
+      "text": "FIP Pop",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/fip-pop.jpg",
+      "item": "station",
+      "URL": "http://icecast.radiofrance.fr/fippop-hifi.aac",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s406076",
+      "text": "FIP Jazz",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/fip-jazz.jpg",
+      "item": "station",
+      "URL": "http://direct.fipradio.fr/live/fipjazz-hifi.aac",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s969416",
+      "text": "FIP Groove",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/fip-groove.jpg",
+      "item": "station",
+      "URL": "http://direct.fipradio.fr/live/fipgroove-hifi.aac",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s461912",
+      "text": "FIP Reggae",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/fip-reggae.jpg",
+      "item": "station",
+      "URL": "http://direct.fipradio.fr/live/fipreggae-hifi.aac",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s202064",
+      "text": "FIP Monde",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/fip-monde.jpg",
+      "item": "station",
+      "URL": "http://direct.fipradio.fr/live/fipworld-hifi.aac",
+      "type": "audio"
+    },
+    {
+      "preset_id": "s932030",
+      "text": "FIP tout nouveau",
+      "image": "https://gitlab.com/f.ansible/ansible-mediaplayer/-/raw/master/extra/fip-tout-nouveau.jpg",
+      "item": "station",
+      "URL": "http://icecast.radiofrance.fr/fipnouveautes-hifi.aac",
+      "type": "audio"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+[Unit]
+Description=GPIO Control Service
+After=multi-user.target
+
+[Service]
+ExecStart=/usr/bin/python3 {{ mediaplayer_install_location }}/mediaplayer/scripts/gpio_control.py
+WorkingDirectory={{ mediaplayer_install_location }}/mediaplayer/scripts/
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User={{ mediaplayer_user_name }}
+
+[Install]
+WantedBy=multi-user.target

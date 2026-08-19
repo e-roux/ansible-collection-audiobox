@@ -1,0 +1,64 @@
+---
+- name: Install mediaplayer InputSources.xml
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/input_sources/InputSources.xml"
+    dest: "{{ mediaplayer_install_location }}/mediaplayer/InputSources.xml"
+    owner: "{{ mediaplayer_user_name }}"
+    group: audio
+    mode: "0640"
+
+- name: Create mediaplayer script directory
+  ansible.builtin.file:
+    owner: "{{ mediaplayer_user_name }}"
+    group: "{{ mediaplayer_user_group }}"
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ mediaplayer_install_location }}/mediaplayer/scripts"
+
+- name: Install gpio_control files
+  ansible.builtin.template:
+    owner: "{{ mediaplayer_user_name }}"
+    group: "{{ mediaplayer_user_group }}"
+    src: "{{ item }}"
+    dest: "{{ mediaplayer_install_location }}/mediaplayer/scripts/{{ item | basename }}"
+    mode: "755"
+  loop:
+    - "{{ role_path }}/templates/input_sources/gpio_control.sh"
+    - "{{ role_path }}/templates/input_sources/switch_to_bluetooth.sh"
+  notify:
+    - "Restart service {{ mediaplayer_service_name }}"
+
+- name: Install GPIO Python control script (hardware only)
+  ansible.builtin.template:
+    owner: "{{ mediaplayer_user_name }}"
+    group: "{{ mediaplayer_user_group }}"
+    src: "{{ role_path }}/templates/input_sources/gpio_control.py"
+    dest: "{{ mediaplayer_install_location }}/mediaplayer/scripts/gpio_control.py"
+    mode: "755"
+  when: not (mediaplayer_test_mode | default(false))
+  notify:
+    - "Restart service {{ mediaplayer_service_name }}"
+
+- name: Install GPIO systemd service (hardware only)
+  ansible.builtin.template:
+    owner: root
+    group: root
+    src: "{{ role_path }}/templates/input_sources/gpio_control.service"
+    dest: "/lib/systemd/system/gpio_control.service"
+    mode: "644"
+  when: not (mediaplayer_test_mode | default(false))
+  notify:
+    - "Enable and start GPIO service"
+
+- name: Create mock GPIO files for testing
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: touch
+    owner: "{{ mediaplayer_user_name }}"
+    group: "{{ mediaplayer_user_group }}"
+    mode: "755"
+  loop:
+    - "{{ mediaplayer_install_location }}/mediaplayer/scripts/gpio_control.py"
+  when: mediaplayer_test_mode | default(false)

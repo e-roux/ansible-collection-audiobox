@@ -1,0 +1,17 @@
+{
+  "head": {
+    "status": "200"
+  },
+  "body": [
+    {% for radio in radios %}
+    {
+      "preset_id": "s{{ loop.index0 }}",
+      "text": "{{ radio.name }}",
+      "image": "{{ radio.img }}",
+      "item": "station",
+      "URL": "{{ radio.stream }}",
+      "type": "audio"
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}

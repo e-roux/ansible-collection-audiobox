@@ -1,0 +1,10 @@
+---
+- name: Add WezTerm key
+  ansible.builtin.apt_key:
+    url: https://apt.fury.io/wez/gpg.key
+    state: present
+
+- name: Add WezTerm repository
+  ansible.builtin.apt_repository:
+    repo: 'deb [signed-by=/usr/share/keyrings/wezterm-fury.gpg] https://apt.fury.io/wez/ * *'
+    state: present

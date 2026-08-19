@@ -1,0 +1,35 @@
+---
+role_name_check: 1
+dependency:
+  name: galaxy
+driver:
+  name: podman
+platforms:
+  - name: debian
+    image: debian:13
+provisioner:
+  name: ansible
+  config_options:
+    defaults:
+      remote_tmp: /tmp/.ansible/tmp
+      interpreter_python: auto_silent
+  inventory:
+    host_vars:
+      debian:
+        ansible_python_interpreter: /usr/bin/python3
+  playbooks:
+    converge: ${MOLECULE_PLAYBOOK:-converge.yml}
+    prepare: prepare.yml
+scenario:
+  name: default
+  test_sequence:
+    - create
+    - prepare
+    - converge
+    - verify
+verifier:
+  name: ansible
+lint: |
+  set -e
+  yamllint .
+  ansible-lint .

@@ -1,0 +1,11 @@
+---
+- hosts: localhost
+  remote_user: root
+  roles:
+    - ../.
+  tasks:
+    - name: Include only a specific task from the role
+      include_role:
+        name: ../.
+      tags:
+        - radiolist

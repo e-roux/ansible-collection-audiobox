@@ -1,0 +1,16 @@
+[Unit]
+Description=Mediaplayer
+Requires=mpd.service
+After=mpd.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User={{ mediaplayer_user_name }}
+WorkingDirectory={{ mediaplayer_install_location }}/mediaplayer
+Environment="LD_LIBRARY_PATH={{ mediaplayer_install_location }}/mediaplayer/mediaplayer_lib/ohNet/linux/aarch64"
+ExecStart=/usr/bin/java -jar mediaplayer.jar
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target

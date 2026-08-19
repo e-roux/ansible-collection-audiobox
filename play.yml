@@ -1,0 +1,19 @@
+---
+- name: Play
+  hosts: localhost
+  tasks:
+    # - name: Set password into macOS Keychain
+    #   ansible.builtin.command:
+    #     ansible.builtin.debug:
+    #       msg: "{{ (lookup('community.general.osx_keychain', 'account=myuser service=myservice') | default('mypassword', true)) }}"
+
+    # - name: Set password in macOS Keychain using keyring
+    #   community.general.keyring:
+    #     name: myservice
+    #     username: myuser
+    #     password: mypassword
+    #     service: myservice
+
+    - name: Get password from macOS Keychain using keyring
+      ansible.builtin.debug:
+        msg: "{{ lookup('community.general.keyring', 'name=myservice username=myuser') }}"

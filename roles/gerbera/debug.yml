@@ -1,0 +1,11 @@
+---
+- name: Debug role variables
+  hosts: localhost
+  gather_facts: true
+  roles:
+    - role: fesaille.audiobox.gerbera
+      when: false
+  tasks:
+    - name: Print gerbera_server_udn
+      ansible.builtin.debug:
+        var: gerbera_server_name

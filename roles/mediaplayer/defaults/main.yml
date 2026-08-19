@@ -1,0 +1,44 @@
+---
+# defaults file for ar_mediaplayer
+mediaplayer_version: 'v0.0.1.8'
+# mediaplayer_release_url: "https://github.com/PeteManchester/MediaPlayer/releases/download/{{ mediaplayer_version }}/mediaplayer.zip"
+mediaplayer_release_url: "https://github.com/PeteManchester/MediaPlayer/raw/master/com.upnp.mediaplayer/download/release/mediaplayer.zip"
+
+mediaplayer_user_name: "mediaplayer"
+mediaplayer_install_location: "/opt"
+mediaplayer_service_name: "mediaplayer"
+mediaplayer_systemd_name: "mediaplayer"
+mediaplayer_default_radios: true
+
+# mediaplayer options
+mediaplayer_airplay_audio_start_delay: false
+mediaplayer_airplay_enabled: false
+mediaplayer_airplay_latency_enabled: true
+mediaplayer_airplay_master_volume_enabled: false
+mediaplayer_airplay_port: 5002
+mediaplayer_java_sound_software_mixer_enabled: false
+mediaplayer_java_soundcard_suffix: "[PLUGHW\\:0,0]--PRIMARY SOUND DRIVER"
+mediaplayer_logconsole_level: "off"
+mediaplayer_logfile_level: "error"
+mediaplayer_logfile_name: "/var/log/mediaplayer_{{ mediaplayer_friendly_name }}.log"
+mediaplayer_enable_avTransport: true
+mediaplayer_enable_receiver: true
+mediaplayer_friendly_name: "mediaplayer"
+mediaplayer_install_from_source: false
+mediaplayer_max_volume: 100
+mediaplayer_mpd_port: 6600
+mediaplayer_player: "mpd"
+mediaplayer_playlist_max: 1000
+mediaplayer_save_local_playlist: true
+mediaplayer_startup_volume: 30
+mediaplayer_mpd_host: "localhost"
+mediaplayer_mpd_preload_timer: 3
+mediaplayer_mplayer_cache_min: 80
+mediaplayer_mplayer_cache_size: 520
+mediaplayer_mplayer_path: "/usr/bin/mplayer"
+mediaplayer_mplayer_playlist: "asx,b4s,kpl,m3u,pls,ram,rm,smil,wax,wvx"
+mediaplayer_openhome_log_level: "Error"
+mediaplayer_openhome_port: 52821
+mediaplayer_songcast_latency_enabled: false
+mediaplayer_webserver_enabled: false
+mediaplayer_webserver_port: 8088

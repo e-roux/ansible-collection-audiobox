@@ -1,0 +1,44 @@
+---
+- name: Install gerbera
+  ansible.builtin.include_tasks: install_debian.yml
+  when: ansible_os_family == "Debian"
+
+- name: Install gerbera configuration
+  ansible.builtin.template:
+    src: config.xml.j2
+    dest: /etc/gerbera/config.xml
+    owner: gerbera
+    group: gerbera
+    mode: "0640"
+  notify: "Restart Gerbera"
+
+- name: Add gerbera to additional groups
+  ansible.builtin.group:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ gerbera_additional_groups }}"
+  when: gerbera_additional_groups | length > 0
+
+- name: Add a music group to manage /audio permissions
+  block:
+    - name: Create music group
+      ansible.builtin.group:
+        name: "{{ music_group_name }}"
+        state: present
+        system: false
+
+    - name: Add user to music group
+      ansible.builtin.user:
+        name: "{{ item }}"
+        append: true
+        groups: "{{ music_group_name }}"
+      loop: "{{ music_group_users }}"
+
+    - name: Set directory permissions
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        group: "{{ music_group_name }}"
+        mode: "0775"
+        recurse: true
+      loop: "{{ music_directories }}"

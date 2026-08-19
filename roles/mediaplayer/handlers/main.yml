@@ -1,0 +1,25 @@
+---
+- name: "Enable and start service {{ mediaplayer_service_name }}"
+  ansible.builtin.service:
+    name: "{{ mediaplayer_service_name }}"
+    enabled: true
+    state: started
+  when: not (mediaplayer_test_mode | default(false))
+
+- name: "Restart service {{ mediaplayer_service_name }}"
+  ansible.builtin.service:
+    name: "{{ mediaplayer_service_name }}"
+    enabled: true
+    state: reloaded
+  when: not (mediaplayer_test_mode | default(false))
+
+- name: "Enable and start GPIO service"
+  ansible.builtin.service:
+    name: gpio_control
+    enabled: true
+    state: started
+  when: not (mediaplayer_test_mode | default(false))
+
+# - name: Systemctl daemon reload
+#   ansible.builtin.systemd:
+#     daemon_reload: true

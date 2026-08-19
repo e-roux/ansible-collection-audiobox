@@ -1,0 +1,83 @@
+---
+- name: "Ensure dependencies are installed on {{ ansible_distribution | lower }}"
+  ansible.builtin.package:
+    state: present
+    name: "{{ lookup('vars', 'mediaplayer_dependencies')[ansible_distribution | lower] }}"
+
+- name: Add the user '{{ mediaplayer_user_name }}'
+  ansible.builtin.user:
+    name: "{{ mediaplayer_user_name }}"
+    group: "{{ mediaplayer_user_group }}"
+    home: "{{ mediaplayer_install_location }}/mediaplayer"
+    comment: "Mediaplayer user"
+    system: true
+
+- name: "Get mediaplayer sources and install"
+  block:
+    - name: Check local mediaplayer source zip
+      ansible.builtin.stat:
+        dest: "/usr/local/src/mediaplayer-{{ mediaplayer_version }}.zip"
+      register: mediaplayer_zip
+
+    - name: "Download mediaplayer release {{ mediaplayer_version }}"
+      ansible.builtin.get_url:
+        url: "{{ mediaplayer_release_url }}"
+        dest: "/usr/local/src/mediaplayer-{{ mediaplayer_version }}.zip"
+        mode: "0644"
+      when: not mediaplayer_zip.stat.exists
+
+    - name: Unarchive mediaplayer release
+      ansible.builtin.unarchive:
+        src: "/usr/local/src/mediaplayer-{{ mediaplayer_version }}.zip"
+        dest: "{{ mediaplayer_install_location }}"
+        owner: "{{ mediaplayer_user_name }}"
+        remote_src: true
+        keep_newer: true
+        # exclude:
+        #   - "{{ mediaplayer_install_location }}/mediaplayer/RadioList.json.sample"
+        #   - "{{ mediaplayer_install_location }}/mediaplayer/run.sh"
+        #   - "{{ mediaplayer_install_location }}/mediaplayer/scripts"
+
+    - name: Removed ununsed files
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "{{ mediaplayer_install_location }}/mediaplayer/RadioList.json.sample"
+        - "{{ mediaplayer_install_location }}/mediaplayer/run.sh"
+        - "{{ mediaplayer_install_location }}/mediaplayer/scripts"
+      changed_when: false
+
+- name: Install app.properties
+  ansible.builtin.template:
+    src: app.properties
+    dest: "{{ mediaplayer_install_location }}/mediaplayer/app.properties"
+    owner: "{{ mediaplayer_user_name }}"
+    group: "{{ mediaplayer_user_group }}"
+    mode: "0644"
+
+- name: Create mediaplayer log file
+  ansible.builtin.file:
+    path: "{{ mediaplayer_logfile_name }}"
+    owner: "{{ mediaplayer_user_name }}"
+    group: "{{ mediaplayer_user_group }}"
+    state: touch
+    mode: "0644"
+
+- name: Generate RadioList.json
+  ansible.builtin.include_tasks: radios.yml
+
+- name: Install input sources
+  ansible.builtin.include_tasks: input_sources.yml
+
+- name: Install mediaplayer.service
+  ansible.builtin.template:
+    src: systemd/system/mediaplayer.service
+    dest: "/lib/systemd/system/{{ mediaplayer_systemd_name }}.service"
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - "Enable and start service {{ mediaplayer_service_name }}"
+    # - Systemctl daemon reload
+    - "Restart service {{ mediaplayer_service_name }}"
