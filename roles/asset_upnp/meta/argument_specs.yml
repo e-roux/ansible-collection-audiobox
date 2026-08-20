@@ -1,0 +1,110 @@
+---
+argument_specs:
+  main:
+    short_description: Install and configure Asset UPNP media server
+    description: |
+      Installs Asset UPNP media server on Linux systems (especially Raspberry Pi).
+      Handles authenticated download from dbPowerAmp using order number.
+    author: Emmanuel Roux
+    version_added: "0.1.0"
+
+    options:
+      asset_upnp_order_number:
+        description: |
+          Your Asset UPNP order/license number from dbPowerAmp.
+          Defaults to ASSET_UPNP_ORDER_NUMBER environment variable.
+        type: str
+        required: true
+
+      asset_upnp_email:
+        description: Email address associated with your dbPowerAmp order.
+        type: str
+        required: false
+        default: ""
+
+      asset_upnp_version:
+        description: Version of Asset UPNP to install.
+        type: str
+        required: false
+        default: "latest"
+
+      asset_upnp_install_dir:
+        description: Installation directory for Asset UPNP.
+        type: path
+        required: false
+        default: "/opt/asset-upnp"
+
+      asset_upnp_service_user:
+        description: System user to run Asset UPNP service under.
+        type: str
+        required: false
+        default: "asset-upnp"
+
+      asset_upnp_service_group:
+        description: System group for Asset UPNP service.
+        type: str
+        required: false
+        default: "asset-upnp"
+
+      asset_upnp_service_enabled:
+        description: Whether to enable Asset UPNP systemd service at boot.
+        type: bool
+        required: false
+        default: true
+
+      asset_upnp_service_started:
+        description: Whether to start Asset UPNP service after installation.
+        type: bool
+        required: false
+        default: true
+
+      asset_upnp_download_url_template:
+        description: |
+          URL template for downloading Asset UPNP.
+          Supports {order}, {email}, {version} substitution.
+        type: str
+        required: false
+        default: >-
+          https://secure.dbpoweramp.com/downloads/asset-upnp-{version}.tar.gz?code={order}
+
+      asset_upnp_archive_checksum:
+        description: Optional SHA256 checksum for archive verification.
+        type: str
+        required: false
+        default: ""
+
+      asset_upnp_keep_archive:
+        description: Whether to retain the downloaded archive after extraction.
+        type: bool
+        required: false
+        default: false
+
+      asset_upnp_port:
+        description: Network port for Asset UPNP service.
+        type: int
+        required: false
+        default: 41413
+
+      asset_upnp_library_path:
+        description: Path to music library directory.
+        type: path
+        required: false
+        default: "/mnt/music"
+
+      asset_upnp_cache_dir:
+        description: Directory for Asset UPNP cache files.
+        type: path
+        required: false
+        default: "/var/cache/asset-upnp"
+
+      asset_upnp_max_connections:
+        description: Maximum concurrent client connections.
+        type: int
+        required: false
+        default: 100
+
+      asset_upnp_max_open_files:
+        description: System limit for open files/connections.
+        type: int
+        required: false
+        default: 4096

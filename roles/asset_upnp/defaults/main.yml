@@ -1,0 +1,49 @@
+---
+# Asset UPNP installation defaults
+
+# REQUIRED: Order number from dbPowerAmp for authenticated downloads
+# Injected from ASSET_UPNP_ORDER_NUMBER environment variable
+asset_upnp_order_number: "{{ lookup('env', 'ASSET_UPNP_ORDER_NUMBER') }}"
+
+# OPTIONAL: Email address for authentication
+asset_upnp_email: ""
+
+# Platform postback ID for dbPowerAmp download portal
+# dl_2=Windows, dl_6=Synology, dl_10=QNAP, dl_14=RPi 32-bit,
+# dl_18=RPi 64-bit, dl_22=Linux 32-bit, dl_26=Linux 64-bit, dl_30=macOS
+asset_upnp_download_platform_id: "dl_18"
+
+# Installation directory
+asset_upnp_install_dir: "/opt/asset-upnp"
+
+# System user and group for the service
+asset_upnp_service_user: "asset-upnp"
+asset_upnp_service_group: "asset-upnp"
+
+# Service management
+asset_upnp_service_enabled: true
+asset_upnp_service_started: true
+
+# Download cache directory - avoids consuming download allocations
+asset_upnp_download_cache_dir: "/var/cache/asset-upnp/downloads"
+
+# Cache filename pattern - uses platform ID to distinguish downloads
+asset_upnp_download_cache_filename: "asset-upnp-{{ asset_upnp_download_platform_id }}.tar.gz"
+
+# Temporary download location
+asset_upnp_temp_download_dir: "/tmp"
+
+# Optional SHA256 checksum for archive verification
+asset_upnp_archive_checksum: ""
+
+# Whether to keep the downloaded archive after extraction
+asset_upnp_keep_archive: false
+
+# Service configuration
+asset_upnp_port: 41413
+asset_upnp_library_path: "/mnt/music"
+asset_upnp_cache_dir: "/var/cache/asset-upnp"
+
+# System limits
+asset_upnp_max_connections: 100
+asset_upnp_max_open_files: 4096

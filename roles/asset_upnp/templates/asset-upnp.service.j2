@@ -1,0 +1,40 @@
+[Unit]
+Description=Asset UPNP Media Server
+Documentation=https://www.dbpoweramp.com/asset-upnp.html
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User={{ asset_upnp_service_user }}
+Group={{ asset_upnp_service_group }}
+WorkingDirectory={{ asset_upnp_install_dir }}
+ExecStart={{ asset_upnp_install_dir }}/Asset UPNP
+
+# Service behavior
+Restart=on-failure
+RestartSec=10s
+StartLimitInterval=600
+StartLimitBurst=3
+
+# Security hardening
+PrivateTmp=yes
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths={{ asset_upnp_install_dir }} {{ asset_upnp_cache_dir }} {{ asset_upnp_library_path }}
+
+# Resource limits
+LimitNOFILE={{ asset_upnp_max_open_files }}
+LimitNPROC=512
+
+# Environment
+Environment="UPNP_PORT={{ asset_upnp_port }}"
+Environment="CACHE_DIR={{ asset_upnp_cache_dir }}"
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=asset-upnp
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,47 @@
+---
+# Molecule create playbook for asset_upnp role
+
+- name: Create
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Create podman network
+      containers.podman.podman_network:
+        name: molecule-{{ molecule_yml.scenario.name }}-asset-upnp
+        state: present
+
+    - name: Create test container
+      containers.podman.podman_container:
+        name: asset-upnp-debian
+        image: geerlingguy/docker-debian13-ansible:latest
+        state: started
+        network: molecule-{{ molecule_yml.scenario.name }}-asset-upnp
+        command: ["sleep", "infinity"]
+        privileged: true
+        volumes:
+          - /sys/fs/cgroup:/sys/fs/cgroup:ro
+          - molecule-asset-upnp-cache:/var/cache/asset-upnp/downloads
+
+    - name: Create inventory host_vars directory
+      ansible.builtin.file:
+        path: "{{ molecule_scenario_directory }}/inventory/host_vars"
+        state: directory
+        mode: "0755"
+
+    - name: Write connection details to inventory host_vars
+      ansible.builtin.copy:
+        dest: "{{ molecule_scenario_directory }}/inventory/host_vars/asset-upnp-debian.yml"
+        content: |
+          ---
+          ansible_connection: containers.podman.podman
+          ansible_python_interpreter: /usr/bin/python3
+        mode: "0644"
+
+    - name: Write instance config
+      ansible.builtin.copy:
+        content: |
+          - instance: asset-upnp-debian
+            connection: containers.podman.podman
+            python_interpreter: /usr/bin/python3
+        dest: "{{ molecule_instance_config }}"
+        mode: "0600"

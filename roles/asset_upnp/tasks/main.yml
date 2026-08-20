@@ -1,0 +1,186 @@
+---
+- name: Ensure required packages are installed
+  ansible.builtin.package:
+    name:
+      - curl
+      - tar
+      - gzip
+    state: present
+
+- name: Create Asset UPNP system user and group
+  block:
+    - name: Ensure group exists
+      ansible.builtin.group:
+        name: "{{ asset_upnp_service_group }}"
+        state: present
+
+    - name: Ensure user exists
+      ansible.builtin.user:
+        name: "{{ asset_upnp_service_user }}"
+        group: "{{ asset_upnp_service_group }}"
+        shell: /usr/sbin/nologin
+        home: "{{ asset_upnp_install_dir }}"
+        state: present
+
+- name: Create download cache directory
+  ansible.builtin.file:
+    path: "{{ asset_upnp_download_cache_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Check for cached archive
+  ansible.builtin.stat:
+    path: "{{ asset_upnp_download_cache_dir }}/{{ asset_upnp_download_cache_filename }}"
+  register: asset_upnp_cached_stat
+
+- name: Download Asset UPNP archive
+  when: not asset_upnp_cached_stat.stat.exists
+  block:
+    - name: Create temporary download directory
+      ansible.builtin.file:
+        path: "{{ asset_upnp_temp_download_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Download Asset UPNP from dbPowerAmp secure portal
+      when: asset_upnp_download_url | default('') | length == 0
+      changed_when: true
+      ansible.builtin.shell:
+        cmd: |
+          set -euo pipefail
+          COOKIES=$(mktemp)
+          PAGE=$(mktemp)
+          trap 'rm -f "$COOKIES" "$PAGE"' EXIT
+
+          # Step 1: Get registration page tokens
+          curl -s -c "$COOKIES" "https://secure.dbpoweramp.com/getorder.aspx" > "$PAGE"
+          VS=$(grep '__VIEWSTATE" value=' "$PAGE" | sed 's/.*value="\([^"]*\)".*/\1/')
+          VSG=$(grep '__VIEWSTATEGENERATOR" value=' "$PAGE" | sed 's/.*value="\([^"]*\)".*/\1/')
+          EV=$(grep '__EVENTVALIDATION" value=' "$PAGE" | sed 's/.*value="\([^"]*\)".*/\1/')
+
+          # Step 2: Submit order number, follow redirect to getreg.aspx
+          curl -s -b "$COOKIES" -L \
+            --data-urlencode "__VIEWSTATE=$VS" \
+            --data-urlencode "__VIEWSTATEGENERATOR=$VSG" \
+            --data-urlencode "__EVENTVALIDATION=$EV" \
+            --data-urlencode "txtOrderNumber={{ asset_upnp_order_number }}" \
+            --data-urlencode "cmdSubmit=Lookup Order" \
+            "https://secure.dbpoweramp.com/getorder.aspx" > "$PAGE"
+
+          # Step 3: Extract new tokens from getreg.aspx
+          VS=$(grep '__VIEWSTATE" value=' "$PAGE" | sed 's/.*value="\([^"]*\)".*/\1/')
+          VSG=$(grep '__VIEWSTATEGENERATOR" value=' "$PAGE" | sed 's/.*value="\([^"]*\)".*/\1/')
+          EV=$(grep '__EVENTVALIDATION" value=' "$PAGE" | sed 's/.*value="\([^"]*\)".*/\1/')
+
+          # Step 4: Trigger download via ASP.NET postback
+          curl -s -b "$COOKIES" \
+            --data-urlencode "__VIEWSTATE=$VS" \
+            --data-urlencode "__VIEWSTATEGENERATOR=$VSG" \
+            --data-urlencode "__EVENTVALIDATION=$EV" \
+            --data-urlencode "__EVENTTARGET={{ asset_upnp_download_platform_id }}" \
+            --data-urlencode "__EVENTARGUMENT=" \
+            "https://secure.dbpoweramp.com/getreg.aspx?ordernum={{ asset_upnp_order_number }}" \
+            -o "{{ asset_upnp_temp_download_dir }}/{{ asset_upnp_download_cache_filename }}"
+      args:
+        executable: /bin/bash
+
+    - name: Download Asset UPNP from direct URL
+      when: asset_upnp_download_url | default('') | length > 0
+      ansible.builtin.get_url:
+        url: "{{ asset_upnp_download_url }}"
+        dest: "{{ asset_upnp_temp_download_dir }}/{{ asset_upnp_download_cache_filename }}"
+        timeout: 300
+        validate_certs: true
+        checksum: "{{ ('sha256:' + asset_upnp_archive_checksum) if asset_upnp_archive_checksum else omit }}"
+        mode: "0644"
+
+    - name: Verify download was successful
+      ansible.builtin.stat:
+        path: "{{ asset_upnp_temp_download_dir }}/{{ asset_upnp_download_cache_filename }}"
+      register: asset_upnp_archive_stat
+      failed_when: not asset_upnp_archive_stat.stat.exists
+
+    - name: Copy archive to download cache
+      ansible.builtin.copy:
+        src: "{{ asset_upnp_temp_download_dir }}/{{ asset_upnp_download_cache_filename }}"
+        dest: "{{ asset_upnp_download_cache_dir }}/{{ asset_upnp_download_cache_filename }}"
+        remote_src: true
+        mode: "0644"
+
+    - name: Display download information
+      ansible.builtin.debug:
+        msg: >-
+          Downloaded: {{ asset_upnp_download_cache_filename }}
+          Size: {{ asset_upnp_archive_stat.stat.size | human_readable(unit='B') }}
+
+  rescue:
+    - name: Fail with informative message
+      ansible.builtin.fail:
+        msg: >-
+          Failed to download Asset UPNP.
+          Verify order number and account status at https://secure.dbpoweramp.com/getorder.aspx
+
+- name: Use cached archive
+  when: asset_upnp_cached_stat.stat.exists
+  ansible.builtin.debug:
+    msg: >-
+      Using cached archive: {{ asset_upnp_download_cache_filename }}
+      Size: {{ asset_upnp_cached_stat.stat.size | human_readable(unit='B') }}
+
+- name: Create installation directory
+  ansible.builtin.file:
+    path: "{{ asset_upnp_install_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Extract Asset UPNP archive
+  ansible.builtin.unarchive:
+    src: "{{ asset_upnp_download_cache_dir }}/{{ asset_upnp_download_cache_filename }}"
+    dest: "{{ asset_upnp_install_dir }}"
+    remote_src: true
+    extra_opts:
+      - --strip-components=1
+
+- name: Set permissions on installation directory
+  ansible.builtin.file:
+    path: "{{ asset_upnp_install_dir }}"
+    owner: "{{ asset_upnp_service_user }}"
+    group: "{{ asset_upnp_service_group }}"
+    mode: "0755"
+    recurse: true
+
+- name: Create cache directory
+  ansible.builtin.file:
+    path: "{{ asset_upnp_cache_dir }}"
+    owner: "{{ asset_upnp_service_user }}"
+    group: "{{ asset_upnp_service_group }}"
+    mode: "0755"
+    state: directory
+
+- name: Configure Asset UPNP service
+  when: ansible_service_mgr == "systemd"
+  block:
+    - name: Create systemd service file
+      ansible.builtin.template:
+        src: asset-upnp.service.j2
+        dest: /etc/systemd/system/asset-upnp.service
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Reload systemd daemon
+
+    - name: Flush handlers to apply systemd changes
+      ansible.builtin.meta: flush_handlers
+
+    - name: Enable Asset UPNP service
+      ansible.builtin.systemd_service:
+        name: asset-upnp
+        enabled: "{{ asset_upnp_service_enabled }}"
+        daemon_reload: true
+
+    - name: Start Asset UPNP service
+      ansible.builtin.systemd_service:
+        name: asset-upnp
+        state: "{{ 'started' if asset_upnp_service_started else 'stopped' }}"
