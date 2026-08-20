@@ -9,9 +9,16 @@ asset_upnp_order_number: "{{ lookup('env', 'ASSET_UPNP_ORDER_NUMBER') }}"
 asset_upnp_email: ""
 
 # Platform postback ID for dbPowerAmp download portal
-# dl_2=Windows, dl_6=Synology, dl_10=QNAP, dl_14=RPi 32-bit,
+# dl_6=Synology, dl_10=QNAP, dl_14=RPi 32-bit,
 # dl_18=RPi 64-bit, dl_22=Linux 32-bit, dl_26=Linux 64-bit, dl_30=macOS
-asset_upnp_download_platform_id: "dl_18"
+# Computed from ansible facts by default, override to force a specific platform
+asset_upnp_download_platform_id: >-
+  {{ 'dl_30' if ansible_system == 'Darwin'
+     else 'dl_18' if ansible_architecture == 'aarch64'
+     else 'dl_14' if ansible_architecture | regex_search('^arm')
+     else 'dl_26' if ansible_architecture == 'x86_64'
+     else 'dl_22'
+  }}
 
 # Installation directory
 asset_upnp_install_dir: "/opt/asset-upnp"

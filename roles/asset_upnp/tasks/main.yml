@@ -143,6 +143,11 @@
     extra_opts:
       - --strip-components=1
 
+- name: Remove cached archive to allow future version updates
+  ansible.builtin.file:
+    path: "{{ asset_upnp_download_cache_dir }}/{{ asset_upnp_download_cache_filename }}"
+    state: absent
+
 - name: Set permissions on installation directory
   ansible.builtin.file:
     path: "{{ asset_upnp_install_dir }}"
