@@ -1,0 +1,29 @@
+---
+# Molecule converge playbook for asset_upnp role
+# Uses mock download in cache for container testing (no real dbPowerAmp download)
+
+- name: Converge
+  hosts: test_instances
+
+  tasks:
+    - name: Create download cache directory
+      ansible.builtin.file:
+        path: /var/cache/asset-upnp/downloads
+        state: directory
+        mode: "0755"
+
+    - name: Create mock Asset UPNP archive in cache
+      ansible.builtin.shell:
+        cmd: |
+          mkdir -p /tmp/mock-build/asset-upnp-mock
+          touch /tmp/mock-build/asset-upnp-mock/Asset
+          tar czf /var/cache/asset-upnp/downloads/asset-upnp-dl_18.tar.gz -C /tmp/mock-build asset-upnp-mock
+          rm -rf /tmp/mock-build
+        creates: /var/cache/asset-upnp/downloads/asset-upnp-dl_18.tar.gz
+
+    - name: Include the asset_upnp role
+      ansible.builtin.include_role:
+        name: "{{ playbook_dir | dirname | dirname }}"
+      vars:
+        asset_upnp_order_number: "MOCK_ORDER"
+        asset_upnp_service_started: false

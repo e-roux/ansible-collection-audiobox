@@ -1,0 +1,47 @@
+---
+# Molecule verify playbook for asset_upnp role
+
+- name: Verify
+  hosts: test_instances
+  gather_facts: false
+
+  tasks:
+    - name: Check installation directory exists
+      ansible.builtin.stat:
+        path: /opt/asset-upnp
+      register: install_dir
+
+    - name: Assert installation directory exists
+      ansible.builtin.assert:
+        that:
+          - install_dir.stat.exists
+        fail_msg: "Asset UPNP installation directory not found"
+
+    - name: Check system user exists
+      ansible.builtin.getent:
+        database: passwd
+        key: asset-upnp
+
+    - name: Assert system user exists
+      ansible.builtin.assert:
+        that:
+          - "'asset-upnp' in ansible_facts.getent_passwd"
+        fail_msg: "Asset UPNP system user not found"
+
+    - name: Check installation directory ownership
+      ansible.builtin.stat:
+        path: /opt/asset-upnp
+      register: dir_stat
+
+    - name: Assert correct ownership
+      ansible.builtin.assert:
+        that:
+          - dir_stat.stat.pw_name == 'asset-upnp'
+        fail_msg: "Asset UPNP directory has wrong owner: {{ dir_stat.stat.pw_name }}"
+
+    - name: Display verification summary
+      ansible.builtin.debug:
+        msg: |
+          Asset UPNP verification complete:
+          - Installation directory: {{ install_dir.stat.exists }}
+          - Owner: {{ dir_stat.stat.pw_name }}

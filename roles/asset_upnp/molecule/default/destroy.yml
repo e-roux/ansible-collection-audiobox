@@ -1,0 +1,23 @@
+---
+# Molecule destroy playbook for asset_upnp role
+
+- name: Destroy
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Stop and remove test container
+      containers.podman.podman_container:
+        name: asset-upnp-debian
+        state: absent
+      failed_when: false
+
+    - name: Remove podman network
+      containers.podman.podman_network:
+        name: molecule-{{ molecule_yml.scenario.name }}-asset-upnp
+        state: absent
+      failed_when: false
+
+    - name: Clean up inventory host_vars
+      ansible.builtin.file:
+        path: "{{ molecule_scenario_directory }}/inventory/host_vars/asset-upnp-debian.yml"
+        state: absent
