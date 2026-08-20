@@ -1,0 +1,14 @@
+---
+# Internal platform mapping - not user-configurable
+# Maps dbPowerAmp platform postback IDs to directory name components
+asset_upnp_platform_names:
+  dl_6: { os: Synology, arch: x64 }
+  dl_10: { os: QNAP, arch: x86 }
+  dl_14: { os: Linux, arch: ARM }
+  dl_18: { os: Linux, arch: ARM64 }
+  dl_22: { os: Linux, arch: x86 }
+  dl_26: { os: Linux, arch: x86_64 }
+  dl_30: { os: macOS, arch: x86_64 }
+
+asset_upnp_expected_os: "{{ asset_upnp_platform_names[asset_upnp_download_platform_id].os }}"
+asset_upnp_expected_arch: "{{ asset_upnp_platform_names[asset_upnp_download_platform_id].arch }}"

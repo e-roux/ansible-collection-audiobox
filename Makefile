@@ -105,6 +105,10 @@ test.unit:
 	$(MAKE) --no-print-directory typecheck
 
 test.integration:
+	MOLECULE_SCENARIO_FLAG=""; \
+	if [ -n "$(MOLECULE_SCENARIO)" ]; then \
+		MOLECULE_SCENARIO_FLAG="--scenario-name $(MOLECULE_SCENARIO)"; \
+	fi; \
 	for role_dir in roles/*; do \
 		role_name=$$(basename $$role_dir); \
 		if [ -n "$(MOLECULE_ROLE)" ] && [ "$$role_name" != "$(MOLECULE_ROLE)" ]; then \
@@ -112,7 +116,7 @@ test.integration:
 		fi; \
 		if [ -d "$$role_dir/molecule" ]; then \
 			$(MSG_INFO) "Testing role: $$role_name"; \
-			(cd "$$role_dir" && $(MOLECULE) test); \
+			(cd "$$role_dir" && $(MOLECULE) test $$MOLECULE_SCENARIO_FLAG); \
 		fi; \
 	done
 

@@ -39,9 +39,22 @@
           - dir_stat.stat.pw_name == 'asset-upnp'
         fail_msg: "Asset UPNP directory has wrong owner: {{ dir_stat.stat.pw_name }}"
 
+    - name: Check extracted binary exists
+      ansible.builtin.stat:
+        path: /opt/asset-upnp/bin/AssetUPnP
+      register: asset_bin
+
+    - name: Assert extracted binary exists
+      ansible.builtin.assert:
+        that:
+          - asset_bin.stat.exists
+          - asset_bin.stat.executable
+        fail_msg: "Asset UPNP binary not found or not executable"
+
     - name: Display verification summary
       ansible.builtin.debug:
         msg: |
           Asset UPNP verification complete:
           - Installation directory: {{ install_dir.stat.exists }}
           - Owner: {{ dir_stat.stat.pw_name }}
+          - Binary: {{ asset_bin.stat.exists }}
