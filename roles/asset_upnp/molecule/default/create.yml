@@ -4,7 +4,15 @@
 - name: Create
   hosts: localhost
   gather_facts: false
+  vars:
+    host_cache_dir: "{{ lookup('env', 'XDG_CACHE_HOME') | default(lookup('env', 'HOME') + '/.cache', true) }}/audiobox/asset-upnp"
   tasks:
+    - name: Ensure host cache directory exists
+      ansible.builtin.file:
+        path: "{{ host_cache_dir }}"
+        state: directory
+        mode: "0755"
+
     - name: Create podman network
       containers.podman.podman_network:
         name: molecule-{{ molecule_yml.scenario.name }}-asset-upnp
@@ -20,7 +28,7 @@
         privileged: true
         volumes:
           - /sys/fs/cgroup:/sys/fs/cgroup:ro
-          - molecule-asset-upnp-cache:/var/cache/asset-upnp/downloads
+          - "{{ host_cache_dir }}:/var/cache/asset-upnp/downloads"
 
     - name: Create inventory host_vars directory
       ansible.builtin.file:
