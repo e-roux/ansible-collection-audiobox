@@ -4,4 +4,4 @@ mediaplayer_dependencies:
   debian:
     - mpd
     - mpc
-    - openjdk-21-jre-headless
+    - default-jre-headless

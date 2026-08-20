@@ -7,7 +7,7 @@
   tasks:
     - name: Include the mediaplayer role
       ansible.builtin.include_role:
-        name: mediaplayer
+        name: "{{ playbook_dir | dirname | dirname }}"
       vars:
         mediaplayer_install_location: /opt
         mediaplayer_user_name: mediaplayer

@@ -14,7 +14,7 @@
     - name: Create test container
       containers.podman.podman_container:
         name: gerbera-debian
-        image: debian:12
+        image: geerlingguy/docker-debian13-ansible:latest
         state: started
         network: molecule-{{ molecule_yml.scenario.name }}-gerbera
         command: ["sleep", "infinity"]
