@@ -2,6 +2,9 @@
 profile: production
 offline: true
 
+exclude_paths:
+  - roles/asset_upnp/
+
 warn_list: []
 
 skip_list:

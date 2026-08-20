@@ -4,3 +4,4 @@
     name: gerbera.service
     state: restarted
     daemon_reload: true
+  when: ansible_service_mgr == "systemd"

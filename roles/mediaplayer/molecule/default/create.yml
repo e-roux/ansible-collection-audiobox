@@ -14,7 +14,7 @@
     - name: Create test container
       containers.podman.podman_container:
         name: mediaplayer-debian
-        image: debian:13
+        image: geerlingguy/docker-debian13-ansible:latest
         state: started
         network: molecule-{{ molecule_yml.scenario.name }}-mediaplayer
         command: ["sleep", "infinity"]

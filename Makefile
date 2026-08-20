@@ -106,8 +106,12 @@ test.unit:
 
 test.integration:
 	for role_dir in roles/*; do \
+		role_name=$$(basename $$role_dir); \
+		if [ -n "$(MOLECULE_ROLE)" ] && [ "$$role_name" != "$(MOLECULE_ROLE)" ]; then \
+			continue; \
+		fi; \
 		if [ -d "$$role_dir/molecule" ]; then \
-			$(MSG_INFO) "Testing role: $$(basename $$role_dir)"; \
+			$(MSG_INFO) "Testing role: $$role_name"; \
 			(cd "$$role_dir" && $(MOLECULE) test); \
 		fi; \
 	done

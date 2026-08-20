@@ -7,4 +7,4 @@
   tasks:
     - name: Include the gerbera role
       ansible.builtin.include_role:
-        name: gerbera
+        name: "{{ playbook_dir | dirname | dirname }}"
